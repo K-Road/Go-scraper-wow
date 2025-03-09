@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/K-Road/Go-scraper-wow/internal/scraper"
 )
 
 type CharacterConfig struct {
@@ -35,10 +37,6 @@ func loadCharacterConfig(filename string) (CharacterConfig, error) {
 	return cconfig, err
 }
 
-func scrapeCharacterData(characterName, realm, region string) {
-	return
-}
-
 func main() {
 	//load characterconfig
 	cconfig, err := loadCharacterConfig("character.config.json") //TODO change to dynamic list
@@ -46,6 +44,8 @@ func main() {
 		fmt.Println("Error loading character config:", err)
 		return
 	}
-	scrapeCharacterData(cconfig.CharacterName, cconfig.Realm, cconfig.Region)
 	fmt.Printf("Scraping %s\n", cconfig.CharacterName)
+
+	scraper.ScrapeCharacterData(cconfig.CharacterName, cconfig.Realm, cconfig.Region)
+
 }
