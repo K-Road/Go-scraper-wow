@@ -3,6 +3,7 @@ package gcs
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 
 	"cloud.google.com/go/storage"
@@ -25,11 +26,24 @@ func UploadtoGCS(bucketName, fileName string) error {
 	//Uploading
 	object := client.Bucket(bucketName).Object("index.html")
 	writer := object.NewWriter(ctx)
-	defer writer.Close()
 
-	_, err = file.WriteTo(writer)
+	_, err = io.Copy(writer, file)
 	if err != nil {
+		writer.Close()
 		return err
+	}
+
+	if err := writer.Close(); err != nil {
+		return err
+	}
+
+	if err := os.Remove(fileName); err != nil {
+		return err
+	}
+	if fileName != "index.html" {
+		if err := os.Remove("index.html"); err != nil && !os.IsNotExist(err) {
+			return err
+		}
 	}
 
 	fmt.Println("File uploaded")
