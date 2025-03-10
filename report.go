@@ -1,0 +1,36 @@
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func GenerateHTMLReport(data string) (string, error) {
+	htmlContent := fmt.Sprintf(`
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<title>WOW Character Report</title>
+			<style>
+				body {font-family: Ariel, sans-serif; padding: 20px; }
+				h1 { color: #007bff; }
+			</style>
+		</head>
+		<body>
+			<h1>Wow Character Data</h1>
+			<p>%s</p>
+		</html>`, data)
+
+	file, err := os.Create("report.html")
+	if err != nil {
+		return "", err
+	}
+
+	defer file.Close()
+
+	_, err = file.WriteString(htmlContent)
+	if err != nil {
+		return "", err
+	}
+	return file.Name(), err
+}
