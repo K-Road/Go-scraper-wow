@@ -52,7 +52,8 @@ func main() {
 		fmt.Println("No Mythic+ score found")
 	}
 
-	filename, err := GenerateHTMLReport(charData)
+	//filename, err := GenerateHTMLReport(charData)
+	filename, err := GenerateHTML(charData)
 	if err != nil {
 		fmt.Println("Error generating report:", err)
 		return
