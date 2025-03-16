@@ -11,12 +11,13 @@ import (
 
 // Data struct for the HTML template
 type TemplateData struct {
-	Name  string
-	Score float64
-	Date  time.Time
+	Name       string
+	Score      float64
+	Date       time.Time
+	ClassColor string
 }
 
-const htmlTemplate = `
+const baseHTMLTemplate = `
 		<!DOCTYPE html>
 		<html>
 		<head>
@@ -24,16 +25,21 @@ const htmlTemplate = `
 			<style>
 				body {font-family: Ariel, sans-serif; padding: 20px; }
 				h1 { color: ; #007bff}
-				h2 { color: %s; }
+				h2 { color: {{.ClassColor}}; }
 			</style>
 		</head>
 		<body>
 			<h1>Wow Character Data</h1>
-			<h2>{{.Name}}</h2>
-			<p>{{.Score}}</p>
-			<br>
-			<p>{{.Date}}</p>
+			{{ template "contentScore" . }}
+			 <p>{{.Date}}</p>
+		</body>
 		</html>`
+
+const contentScoreHTMLTemplate = `
+{{define "contentScore"}}
+<h2>{{.Name}}</h2>
+<p>{{.Score}}</p>
+{{end}}`
 
 func GenerateHTMLReport(data scraper.APIResponse) (string, error) {
 	color := getClassColor(data.Class)
@@ -81,15 +87,21 @@ func GenerateHTML(data scraper.APIResponse) (string, error) {
 	}
 
 	templateData := TemplateData{
-		Name:  data.Name,
-		Score: score,
-		Date:  time.Now(),
+		Name:       data.Name,
+		Score:      score,
+		Date:       time.Now(),
+		ClassColor: getClassColor(data.Class),
 	}
 
-	tmpl, err := template.New("report").Parse(htmlTemplate)
+	tmpl, err := template.New("base").Parse(baseHTMLTemplate)
 	if err != nil {
 		return "", err
 	}
+	_, err = tmpl.New("contentScore").Parse(contentScoreHTMLTemplate)
+	if err != nil {
+		return "", err
+	}
+
 	fileName := "/tmp/output.html"
 	file, err := os.Create(fileName)
 	if err != nil {
