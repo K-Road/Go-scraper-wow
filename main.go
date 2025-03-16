@@ -59,7 +59,12 @@ func main() {
 		return
 	}
 
-	err = gcs.UploadtoGCS(gcsConfig.BucketName, filename)
+	err = gcs.UploadtoGCS(gcsConfig.BucketName, filename, "index.html", true)
+	if err != nil {
+		fmt.Println("Error uploading", err)
+		return
+	}
+	err = gcs.UploadtoGCS(gcsConfig.AssetBucketName, "static/styles.css", "styles.css", false)
 	if err != nil {
 		fmt.Println("Error uploading", err)
 		return

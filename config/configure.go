@@ -28,7 +28,8 @@ func LoadCharacterConfig(filename string) (CharacterConfig, error) {
 }
 
 type GCSConfig struct {
-	BucketName string
+	BucketName      string
+	AssetBucketName string
 }
 
 func LoadGCSConfig() (GCSConfig, error) {
@@ -38,7 +39,8 @@ func LoadGCSConfig() (GCSConfig, error) {
 		return GCSConfig{}, err
 	}
 	gcs := &GCSConfig{
-		BucketName: os.Getenv("BUCKETNAME"),
+		BucketName:      os.Getenv("BUCKETNAME"),
+		AssetBucketName: os.Getenv("ASSETBUCKETNAME"),
 	}
 
 	return *gcs, nil

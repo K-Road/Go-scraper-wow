@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"os"
 	"time"
 
 	"github.com/K-Road/Go-scraper-wow/internal/scraper"
+	"github.com/K-Road/Go-scraper-wow/internal/templates"
 )
 
 // Data struct for the HTML template
@@ -17,29 +17,28 @@ type TemplateData struct {
 	ClassColor string
 }
 
-const baseHTMLTemplate = `
-		<!DOCTYPE html>
-		<html>
-		<head>
-			<title>WOW Character Report</title>
-			<style>
-				body {font-family: Ariel, sans-serif; padding: 20px; }
-				h1 { color: ; #007bff}
-				h2 { color: {{.ClassColor}}; }
-			</style>
-		</head>
-		<body>
-			<h1>Wow Character Data</h1>
-			{{ template "contentScore" . }}
-			 <p>{{.Date}}</p>
-		</body>
-		</html>`
+// const baseHTMLTemplate = `
+// <!DOCTYPE html>
+// <html>
+// <head>
+// 	<title>WOW Character Report</title>
+// 	<style>
+// 		body {font-family: Ariel, sans-serif; padding: 20px; }
+// 		h2 { color: {{.ClassColor}}; }
+// 	</style>
+// </head>
+// <body>
+// 	<h1>Wow Character Data</h1>
+// 	{{ template "contentScore" . }}
+// 		<p>{{.Date}}</p>
+// </body>
+// </html>`
 
-const contentScoreHTMLTemplate = `
-{{define "contentScore"}}
-<h2>{{.Name}}</h2>
-<p>{{.Score}}</p>
-{{end}}`
+// const contentScoreHTMLTemplate = `
+// {{define "contentScore"}}
+// <h2>{{.Name}}</h2>
+// <p>MPlus Score: {{.Score}}</p>
+// {{end}}`
 
 func GenerateHTMLReport(data scraper.APIResponse) (string, error) {
 	color := getClassColor(data.Class)
@@ -93,14 +92,19 @@ func GenerateHTML(data scraper.APIResponse) (string, error) {
 		ClassColor: getClassColor(data.Class),
 	}
 
-	tmpl, err := template.New("base").Parse(baseHTMLTemplate)
+	tmpl, err := templates.LoadTemplates()
 	if err != nil {
 		return "", err
 	}
-	_, err = tmpl.New("contentScore").Parse(contentScoreHTMLTemplate)
-	if err != nil {
-		return "", err
-	}
+	//	tmpl, err := template.New("base").Parse(baseHTMLTemplate)
+	// tmpl, err := template.ParseFiles("template/base.html", "content-score.html")
+	// if err != nil {
+	// 	return "", err
+	// }
+	// _, err = tmpl.New("contentScore").Parse(contentScoreHTMLTemplate)
+	// if err != nil {
+	// 	return "", err
+	// }
 
 	fileName := "/tmp/output.html"
 	file, err := os.Create(fileName)
@@ -114,12 +118,23 @@ func GenerateHTML(data scraper.APIResponse) (string, error) {
 }
 
 func getClassColor(class string) string {
-	color := "#007bff"
-	switch class {
-	case "Paladin":
-		color = "#F48CBA"
-	case "Warlock":
-		color = "#8788EE"
+	classColors := map[string]string{
+		"Warrior":      "#C79C6E",
+		"Paladin":      "#F58CBA",
+		"Hunter":       "#ABD473",
+		"Rogue":        "#FFF569",
+		"Priest":       "#FFFFFF",
+		"Death Knight": "#C41F3B",
+		"Shaman":       "#0070DE",
+		"Mage":         "#69CCF0",
+		"Warlock":      "#9482C9",
+		"Monk":         "#00FF96",
+		"Druid":        "#FF7D0A",
+		"Demon Hunter": "#A330C9",
+	}
+	color, exists := classColors[class]
+	if !exists {
+		return "#FFFFFF" // Default to white if class not found
 	}
 	return color
 }
