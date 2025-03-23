@@ -10,6 +10,6 @@
 <body>
 	<h1>Wow Character Data</h1>
 	{{ template "contentScore" . }}
-		<p>{{.Date}}</p>
+	<p>{{.BaseData.Date.Format "2006-01-02 15:04:05"}}</p>
 </body>
 </html>

@@ -10,35 +10,11 @@ import (
 )
 
 // Data struct for the HTML template
-type TemplateData struct {
-	Name       string
-	Score      float64
-	Date       time.Time
-	ClassColor string
-}
-
-// const baseHTMLTemplate = `
-// <!DOCTYPE html>
-// <html>
-// <head>
-// 	<title>WOW Character Report</title>
-// 	<style>
-// 		body {font-family: Ariel, sans-serif; padding: 20px; }
-// 		h2 { color: {{.ClassColor}}; }
-// 	</style>
-// </head>
-// <body>
-// 	<h1>Wow Character Data</h1>
-// 	{{ template "contentScore" . }}
-// 		<p>{{.Date}}</p>
-// </body>
-// </html>`
-
-// const contentScoreHTMLTemplate = `
-// {{define "contentScore"}}
-// <h2>{{.Name}}</h2>
-// <p>MPlus Score: {{.Score}}</p>
-// {{end}}`
+// type TemplateData struct {
+// 	Name       string
+// 	Score      float64
+// 	ClassColor string
+// }
 
 func GenerateHTMLReport(data scraper.APIResponse) (string, error) {
 	color := getClassColor(data.Class)
@@ -78,33 +54,25 @@ func GenerateHTMLReport(data scraper.APIResponse) (string, error) {
 
 func GenerateHTML(data scraper.APIResponse) (string, error) {
 
-	var score float64
-	if len(data.MythicPlusScoresBySeason) > 0 {
-		score = data.MythicPlusScoresBySeason[0].Scores.Dps
-	} else {
-		score = 0.0
-	}
+	score := mplusScore(data)
 
-	templateData := TemplateData{
+	baseData := templates.GetBaseTemplateData()
+	//Generate template data //##TODO pull this out. Put in template data generator. Pass into this func as param
+	scoreData := templates.ScoreContentData{
 		Name:       data.Name,
 		Score:      score,
-		Date:       time.Now(),
 		ClassColor: getClassColor(data.Class),
+	}
+
+	pageData := templates.PageData{
+		BaseData:  baseData,
+		ScoreData: scoreData,
 	}
 
 	tmpl, err := templates.LoadTemplates()
 	if err != nil {
 		return "", err
 	}
-	//	tmpl, err := template.New("base").Parse(baseHTMLTemplate)
-	// tmpl, err := template.ParseFiles("template/base.html", "content-score.html")
-	// if err != nil {
-	// 	return "", err
-	// }
-	// _, err = tmpl.New("contentScore").Parse(contentScoreHTMLTemplate)
-	// if err != nil {
-	// 	return "", err
-	// }
 
 	fileName := "/tmp/output.html"
 	file, err := os.Create(fileName)
@@ -113,7 +81,7 @@ func GenerateHTML(data scraper.APIResponse) (string, error) {
 	}
 	defer file.Close()
 
-	err = tmpl.Execute(file, templateData)
+	err = tmpl.Execute(file, pageData)
 	return fileName, err
 }
 

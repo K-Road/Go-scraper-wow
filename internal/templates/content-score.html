@@ -1,4 +1,6 @@
 {{define "contentScore"}}
-<h2 style="--class-color: {{ .ClassColor }};">{{ .Name }}</h2>
-<p>MPlus Score: {{.Score}}</p>
+<section style="background-color: lightblue; padding: 10px;">
+<h2 style="--class-color: {{ .ScoreData.ClassColor }};">{{ .ScoreData.Name }}</h2>
+<p>MPlus Score: {{.ScoreData.Score}}</p>
+</section>
 {{end}}
