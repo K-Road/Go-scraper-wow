@@ -64,9 +64,14 @@ func GenerateHTML(data scraper.APIResponse) (string, error) {
 		ClassColor: getClassColor(data.Class),
 	}
 
+	gearData := templates.GearContentData{
+		GearScore: data.Gear.ItemLevelEquipped,
+	}
+
 	pageData := templates.PageData{
 		BaseData:  baseData,
 		ScoreData: scoreData,
+		GearData:  gearData,
 	}
 
 	tmpl, err := templates.LoadTemplates()

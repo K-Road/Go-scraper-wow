@@ -6,7 +6,7 @@ import (
 )
 
 func LoadTemplates() (*template.Template, error) {
-	return template.ParseFiles("internal/templates/base.html", "internal/templates/content-score.html")
+	return template.ParseFiles("internal/templates/base.html", "internal/templates/content-score.html", "internal/templates/content-gear.html")
 }
 
 // Data struct for the HTML template
@@ -24,10 +24,21 @@ func GetBaseTemplateData() BaseTemplateData {
 type PageData struct {
 	BaseData  BaseTemplateData
 	ScoreData ScoreContentData
+	GearData  GearContentData
 }
 
 type ScoreContentData struct {
 	Name       string
 	Score      float64
 	ClassColor string
+}
+
+type Item struct {
+	ItemID    int
+	ItemLevel int
+	Slot      string
+}
+
+type GearContentData struct {
+	GearScore float64
 }
