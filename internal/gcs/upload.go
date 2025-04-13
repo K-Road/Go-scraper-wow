@@ -32,7 +32,7 @@ func UploadtoGCS(bucketName, fileName, objectName string, deleteAfterUpload bool
 	}
 
 	//Uploading
-	if err := upload(client, ctx, bucketName, objectName, file, objectName == "style.css"); err != nil {
+	if err := upload(client, ctx, bucketName, objectName, file, objectName == "styles.css"); err != nil {
 		return err
 	}
 
@@ -49,10 +49,16 @@ func upload(client *storage.Client, ctx context.Context, bucketName, objectName 
 
 	if isCSS {
 		writer.ContentType = "text/css"
+		writer.Metadata = map[string]string{
+			"Cache-Control": "no-cache",
+		}
 	}
 
-	_, err := io.Copy(writer, file)
-	return err
+	if _, err := io.Copy(writer, file); err != nil {
+		return fmt.Errorf("copy to GCS: %w", err)
+	}
+
+	return nil
 }
 
 func handleFileDeletion(fileName, objectName string, deleteAfterUpload bool) {
